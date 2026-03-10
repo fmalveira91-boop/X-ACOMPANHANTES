@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>X-ACOMPANHANTES | Elite</title>
+    <title>X-ACOMPANHANTES | Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; }
+        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .app-card { background: #0a0a0a; border-radius: 30px; overflow: hidden; margin-bottom: 30px; border: 1px solid #1a1a1a; }
         .snap-x { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
         .snap-item { scroll-snap-align: start; flex: 0 0 100%; width: 100%; height: 500px; object-fit: cover; }
@@ -18,19 +18,20 @@
         .hidden { display: none; }
         input[type="file"] { display: none; }
         .upload-btn { background: #111; border: 2px dashed #333; padding: 40px; border-radius: 20px; text-align: center; cursor: pointer; }
-        .btn-disabled { opacity: 0.3; cursor: not-allowed; pointer-events: none; }
+        .btn-disabled { opacity: 0.2; pointer-events: none; }
+        .pink-glow { text-shadow: 0 0 15px rgba(255, 0, 85, 0.6); }
     </style>
 </head>
 <body>
 
-    <header class="p-6 flex justify-between items-center sticky top-0 z-[100] bg-black/90 border-b border-zinc-900">
-        <h1 onclick="showTab('home')" class="text-2xl font-black italic text-pink-600 tracking-tighter cursor-pointer">X-ACOMPANHANTES</h1>
+    <header class="p-6 flex justify-between items-center sticky top-0 z-[100] bg-black/95 backdrop-blur-md border-b border-zinc-900">
+        <h1 onclick="showTab('home')" class="text-2xl font-black italic text-pink-600 tracking-tighter cursor-pointer pink-glow">X-ACOMPANHANTES</h1>
         <button onclick="showTab('anunciar')" class="bg-pink-600 px-5 py-2 rounded-full text-[10px] font-black uppercase">Anunciar</button>
     </header>
 
     <main id="tab-home" class="p-4 pb-40">
         <div id="grid-modelos" class="space-y-6">
-            <div class="text-center py-20 text-zinc-800 font-bold uppercase tracking-widest italic">Sincronizando...</div>
+            <div class="text-center py-20 text-zinc-800 font-bold uppercase tracking-widest italic animate-pulse">A ligar à rede...</div>
         </div>
     </main>
 
@@ -38,12 +39,12 @@
         <div class="max-w-md mx-auto space-y-6">
             <h2 class="text-3xl font-black italic text-pink-600">NOVO PERFIL</h2>
             <div class="space-y-4">
-                <input type="text" id="nome-m" placeholder="Nome Profissional" class="w-full bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800 text-white">
+                <input type="text" id="nome-m" placeholder="Nome Profissional" class="w-full bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800">
                 <div class="flex gap-2">
-                    <input type="number" id="idade-m" placeholder="Idade" class="w-1/2 bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800 text-white">
-                    <input type="text" id="valor-m" placeholder="Preço €" class="w-1/2 bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800 text-white">
+                    <input type="number" id="idade-m" placeholder="Idade" class="w-1/2 bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800">
+                    <input type="text" id="valor-m" placeholder="Preço €" class="w-1/2 bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800">
                 </div>
-                <input type="text" id="tel-m" placeholder="WhatsApp (ex: 351912...)" class="w-full bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800 text-white">
+                <input type="text" id="tel-m" placeholder="WhatsApp (ex: 351912...)" class="w-full bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800">
 
                 <label class="upload-btn block" id="label-file">
                     <i class="fas fa-camera text-3xl mb-2 text-pink-600"></i>
@@ -51,7 +52,7 @@
                     <input type="file" id="file-input" multiple accept="image/*,video/*">
                 </label>
                 
-                <div id="status-msg" class="text-center text-[10px] font-bold uppercase tracking-widest"></div>
+                <div id="status-msg" class="text-center text-[10px] font-bold uppercase tracking-widest text-zinc-500">Aguardando fotos...</div>
 
                 <button onclick="enviarTudo()" id="btn-publicar" class="btn-disabled w-full bg-white text-black p-5 rounded-2xl font-black uppercase tracking-widest shadow-xl">Publicar Agora</button>
             </div>
@@ -63,32 +64,34 @@
     </div>
 
     <div id="painelAdmin" class="hidden fixed inset-0 z-[200] bg-black p-6 overflow-y-auto">
-        <h2 class="text-xl font-black italic text-yellow-500 mb-6 border-b border-zinc-800 pb-2">APROVAÇÕES</h2>
+        <h2 class="text-xl font-black italic text-yellow-500 mb-6 border-b border-zinc-800 pb-2 uppercase">Aprovações</h2>
         <div id="lista-pendentes" class="space-y-4"></div>
-        <button onclick="document.getElementById('painelAdmin').classList.add('hidden')" class="mt-10 text-zinc-600 text-[10px] font-bold uppercase tracking-widest">Sair do Painel</button>
+        <button onclick="document.getElementById('painelAdmin').classList.add('hidden')" class="mt-10 text-zinc-600 text-[10px] font-bold uppercase tracking-widest underline">Voltar</button>
     </div>
 
-    <nav class="fixed bottom-6 left-6 right-6 h-20 glass rounded-[35px] flex justify-around items-center z-[150] shadow-2xl border border-white/5">
+    <nav class="fixed bottom-6 left-6 right-6 h-20 glass rounded-[35px] flex justify-around items-center z-[150] shadow-2xl">
         <div onclick="showTab('home')" class="text-pink-600 text-xl"><i class="fas fa-fire"></i></div>
         <div onclick="showTab('anunciar')" class="text-zinc-500 text-xl"><i class="fas fa-plus-circle"></i></div>
     </nav>
 
     <script>
+        // TUAS CHAVES REAIS APLICADAS
         const firebaseConfig = {
-            apiKey: "AIzaSyAs-J8pY6Xz9...", 
+            apiKey: "AIzaSyCzOCyLJjILaLYWejWRRo3o-2IjzNsNvrk",
             authDomain: "x-acompanhantes.firebaseapp.com",
             projectId: "x-acompanhantes",
-            storageBucket: "x-acompanhantes.appspot.com",
-            messagingSenderId: "8472947291",
-            appId: "1:8472947291:web:..."
+            storageBucket: "x-acompanhantes.firebasestorage.app",
+            messagingSenderId: "845747730590",
+            appId: "1:845747730590:web:52b4be5b58936421aa638f"
         };
+        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const storage = firebase.storage();
 
         let linksArquivos = [];
 
-        // LÓGICA DE UPLOAD MELHORADA
+        // LÓGICA DE UPLOAD
         document.getElementById('file-input').onchange = async (e) => {
             const files = e.target.files;
             if (files.length === 0) return;
@@ -98,8 +101,8 @@
             const texto = document.getElementById('texto-upload');
             
             btn.classList.add('btn-disabled');
-            msg.innerText = "A subir ficheiros... aguarda";
-            msg.className = "text-center text-[10px] font-bold text-yellow-500 uppercase tracking-widest";
+            msg.innerText = "⏳ A subir para o servidor...";
+            msg.style.color = "#eab308";
             linksArquivos = [];
 
             try {
@@ -109,22 +112,20 @@
                     const url = await ref.getDownloadURL();
                     linksArquivos.push({url, type: file.type});
                 }
-                msg.innerText = "✅ Upload Concluído!";
-                msg.className = "text-center text-[10px] font-bold text-green-500 uppercase tracking-widest";
-                texto.innerText = `${files.length} Ficheiros Selecionados`;
-                btn.classList.remove('btn-disabled'); // Ativa o botão aqui!
+                msg.innerText = "✅ Concluído! Já podes publicar.";
+                msg.style.color = "#22c55e";
+                texto.innerText = `${files.length} selecionados`;
+                btn.classList.remove('btn-disabled');
             } catch (err) {
-                alert("Erro no upload. Verifica se o Storage do Firebase está ativo!");
-                msg.innerText = "Erro ao carregar fotos.";
+                console.error(err);
+                msg.innerText = "❌ Erro: Verifica as REGRAS no Storage!";
+                msg.style.color = "#ef4444";
             }
         };
 
         async function enviarTudo() {
             const nome = document.getElementById('nome-m').value;
-            if(!nome || linksArquivos.length === 0) {
-                alert("Obrigatório: Nome e Fotos!");
-                return;
-            }
+            if(!nome || linksArquivos.length === 0) return alert("Falta o nome ou as fotos!");
             
             await db.collection("modelos").add({
                 nome,
@@ -135,14 +136,14 @@
                 aprovado: false,
                 data: new Date()
             });
-            alert("Perfil enviado! Aguarda aprovação do Admin.");
+            alert("Perfil enviado com sucesso!");
             location.reload();
         }
 
         function carregarModelos() {
             db.collection("modelos").where("aprovado", "==", true).onSnapshot(snap => {
                 const grid = document.getElementById('grid-modelos');
-                grid.innerHTML = snap.empty ? "<p class='text-center text-zinc-800 py-10 uppercase text-[10px] font-bold tracking-widest'>Nenhum perfil ativo no momento</p>" : "";
+                grid.innerHTML = snap.empty ? "<p class='text-center text-zinc-800 py-20 text-xs font-bold uppercase tracking-widest'>Sem perfis ativos</p>" : "";
                 snap.forEach(doc => {
                     const m = doc.data();
                     let slides = '';
@@ -155,9 +156,9 @@
                     });
 
                     grid.innerHTML += `
-                    <div class="app-card animate-app">
+                    <div class="app-card">
                         <div class="snap-x">${slides}</div>
-                        <div class="p-6">
+                        <div class="p-6 bg-zinc-900/20">
                             <div class="flex justify-between items-center mb-4">
                                 <div><h3 class="text-2xl font-black italic uppercase">${m.nome}</h3><p class="text-zinc-500 text-[10px] font-bold uppercase tracking-widest">${m.idade} ANOS</p></div>
                                 <div class="text-pink-500 font-black text-xl">${m.valor}€</div>
@@ -172,15 +173,14 @@
         function showTab(t) {
             document.getElementById('tab-home').classList.toggle('hidden', t !== 'home');
             document.getElementById('tab-anunciar').classList.toggle('hidden', t !== 'anunciar');
-            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function abrirAdmin() {
-            if(prompt("PASSWORD:") === "olokobicho77") {
+            if(prompt("SENHA ADMIN:") === "olokobicho77") {
                 document.getElementById('painelAdmin').classList.remove('hidden');
                 db.collection("modelos").where("aprovado", "==", false).onSnapshot(snap => {
                     const l = document.getElementById('lista-pendentes');
-                    l.innerHTML = snap.empty ? "Vazio." : "";
+                    l.innerHTML = snap.empty ? "<p class='text-zinc-600 text-center text-xs'>Nada para aprovar.</p>" : "";
                     snap.forEach(doc => {
                         l.innerHTML += `<div class="bg-zinc-900 p-4 rounded-xl flex justify-between items-center mb-2"><span>${doc.data().nome}</span><button onclick="aprovar('${doc.id}')" class="bg-green-600 text-white px-4 py-2 rounded-full font-bold text-[10px]">APROVAR</button></div>`;
                     });
@@ -190,81 +190,5 @@
         function aprovar(id) { db.collection("modelos").doc(id).update({ aprovado: true }); }
         carregarModelos();
     </script>
-    <script>
-    // GARENTE QUE ESTAS SÃO AS TUAS CHAVES REAIS DO FIREBASE
-    const firebaseConfig = {
-        apiKey: "COLA_AQUI_A_TUA_API_KEY",
-        authDomain: "x-acompanhantes.firebaseapp.com",
-        projectId: "x-acompanhantes",
-        storageBucket: "x-acompanhantes.appspot.com",
-        messagingSenderId: "8472947291",
-        appId: "1:8472947291:web:..."
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-
-    let linksArquivos = [];
-
-    document.getElementById('file-input').onchange = async (e) => {
-        const files = e.target.files;
-        if (files.length === 0) return;
-
-        const btn = document.getElementById('btn-publicar');
-        const msg = document.getElementById('status-msg');
-        
-        btn.classList.add('btn-disabled');
-        msg.innerText = "⏳ A ligar ao servidor...";
-        msg.style.color = "#eab308"; // Amarelo
-        linksArquivos = [];
-
-        try {
-            for (let file of files) {
-                // Criar a referência
-                const ref = storage.ref().child(`modelos/${Date.now()}-${file.name}`);
-                
-                // Iniciar o upload
-                const uploadTask = await ref.put(file);
-                const url = await uploadTask.ref.getDownloadURL();
-                
-                linksArquivos.push({url, type: file.type});
-                msg.innerText = `A carregar: ${linksArquivos.length}/${files.length}`;
-            }
-            
-            msg.innerText = "✅ TUDO PRONTO! Podes publicar.";
-            msg.style.color = "#22c55e"; // Verde
-            btn.classList.remove('btn-disabled');
-            btn.style.opacity = "1";
-
-        } catch (err) {
-            console.error(err);
-            msg.innerText = "❌ ERRO: Verifica as Rules do Storage!";
-            msg.style.color = "#ef4444"; // Vermelho
-            alert("O Firebase bloqueou o upload. Vá em Storage > Rules e mude para 'allow read, write: if true;'");
-        }
-    };
-
-    async function enviarTudo() {
-        const nome = document.getElementById('nome-m').value;
-        if(!nome || linksArquivos.length === 0) return alert("Falta o nome ou as fotos!");
-
-        try {
-            await db.collection("modelos").add({
-                nome,
-                idade: document.getElementById('idade-m').value || '?',
-                valor: document.getElementById('valor-m').value || '?',
-                tel: document.getElementById('tel-m').value || '',
-                media: linksArquivos,
-                aprovado: false,
-                data: new Date()
-            });
-            alert("Enviado! O Admin (você) precisa de aprovar no cadeado.");
-            location.reload();
-        } catch (err) {
-            alert("Erro ao salvar dados: " + err.message);
-        }
-    }
-    // ... resto do código de carregar modelos ...
-</script>
 </body>
 </html>
