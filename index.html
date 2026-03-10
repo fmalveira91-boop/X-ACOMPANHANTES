@@ -190,5 +190,81 @@
         function aprovar(id) { db.collection("modelos").doc(id).update({ aprovado: true }); }
         carregarModelos();
     </script>
+    <script>
+    // GARENTE QUE ESTAS SÃO AS TUAS CHAVES REAIS DO FIREBASE
+    const firebaseConfig = {
+        apiKey: "COLA_AQUI_A_TUA_API_KEY",
+        authDomain: "x-acompanhantes.firebaseapp.com",
+        projectId: "x-acompanhantes",
+        storageBucket: "x-acompanhantes.appspot.com",
+        messagingSenderId: "8472947291",
+        appId: "1:8472947291:web:..."
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    let linksArquivos = [];
+
+    document.getElementById('file-input').onchange = async (e) => {
+        const files = e.target.files;
+        if (files.length === 0) return;
+
+        const btn = document.getElementById('btn-publicar');
+        const msg = document.getElementById('status-msg');
+        
+        btn.classList.add('btn-disabled');
+        msg.innerText = "⏳ A ligar ao servidor...";
+        msg.style.color = "#eab308"; // Amarelo
+        linksArquivos = [];
+
+        try {
+            for (let file of files) {
+                // Criar a referência
+                const ref = storage.ref().child(`modelos/${Date.now()}-${file.name}`);
+                
+                // Iniciar o upload
+                const uploadTask = await ref.put(file);
+                const url = await uploadTask.ref.getDownloadURL();
+                
+                linksArquivos.push({url, type: file.type});
+                msg.innerText = `A carregar: ${linksArquivos.length}/${files.length}`;
+            }
+            
+            msg.innerText = "✅ TUDO PRONTO! Podes publicar.";
+            msg.style.color = "#22c55e"; // Verde
+            btn.classList.remove('btn-disabled');
+            btn.style.opacity = "1";
+
+        } catch (err) {
+            console.error(err);
+            msg.innerText = "❌ ERRO: Verifica as Rules do Storage!";
+            msg.style.color = "#ef4444"; // Vermelho
+            alert("O Firebase bloqueou o upload. Vá em Storage > Rules e mude para 'allow read, write: if true;'");
+        }
+    };
+
+    async function enviarTudo() {
+        const nome = document.getElementById('nome-m').value;
+        if(!nome || linksArquivos.length === 0) return alert("Falta o nome ou as fotos!");
+
+        try {
+            await db.collection("modelos").add({
+                nome,
+                idade: document.getElementById('idade-m').value || '?',
+                valor: document.getElementById('valor-m').value || '?',
+                tel: document.getElementById('tel-m').value || '',
+                media: linksArquivos,
+                aprovado: false,
+                data: new Date()
+            });
+            alert("Enviado! O Admin (você) precisa de aprovar no cadeado.");
+            location.reload();
+        } catch (err) {
+            alert("Erro ao salvar dados: " + err.message);
+        }
+    }
+    // ... resto do código de carregar modelos ...
+</script>
 </body>
 </html>
