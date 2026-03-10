@@ -219,5 +219,33 @@
 
         loadCatalog();
     </script>
+    <div id="admin-trigger" onclick="toggleAdminPanel()" style="position: fixed; bottom: 20px; left: 20px; width: 45px; height: 45px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 9999; cursor: pointer; backdrop-filter: blur(5px);">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 16 16" style="opacity: 0.5;">
+        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+    </svg>
+</div>
+
+<script>
+function toggleAdminPanel() {
+    // Esta função força a abertura do painel de administração que já está no teu código
+    if (typeof showAdmin === "function") {
+        showAdmin();
+    } else {
+        // Caso a função showAdmin não exista com esse nome, tentamos mudar o hash
+        window.location.hash = 'admin';
+        location.reload();
+    }
+}
+
+// Atalho extra: Se digitares "admin" no teclado, ele também abre
+let keys = "";
+window.addEventListener("keydown", (e) => {
+    keys += e.key;
+    if (keys.endsWith("admin")) {
+        toggleAdminPanel();
+        keys = "";
+    }
+});
+</script>
 </body>
 </html>
