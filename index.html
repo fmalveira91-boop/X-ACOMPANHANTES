@@ -3,249 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-ACOMPANHANTES | Elite, GP e Garotas do Job em Portugal</title>
-    
-    <link rel="icon" type="image/png" href="https://i.ibb.co/vzYfF2P/xa-favicon.png">
+    <title>X-ACOMPANHANTES | Elite Portugal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
     <style>
-        :root { --pink: #ff007a; --dark: #050505; }
-        body { background: var(--dark); color: white; font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
-        .pink-text { color: var(--pink); }
-        .pink-bg { background: var(--pink); }
-        .hidden { display: none !important; }
-        .glass { background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(15px); }
-
-        /* Estilo Cidades */
-        .city-btn { background: #111; color: #666; border: 1px solid #222; padding: 8px 16px; border-radius: 50px; font-size: 11px; font-weight: bold; white-space: nowrap; }
-        .city-btn.active { background: var(--pink); color: white; border-color: var(--pink); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-
-        /* Cards */
-        .card-model { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 24px; overflow: hidden; }
-        .slider-container { position: relative; height: 450px; background: #000; }
-        .photo-slider { display: flex; overflow-x: auto; snap-type: x mandatory; scrollbar-width: none; height: 100%; }
-        .photo-slider img { flex: 0 0 100%; height: 100%; object-fit: cover; snap-align: start; }
-        
-        /* Revista */
-        #magazine-view { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; justify-content: center; align-items: center; }
-        #magazine-view img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .nav-rev { position: absolute; top: 50%; transform: translateY(-50%); font-size: 40px; color: white; padding: 20px; cursor: pointer; opacity: 0.5; }
-        .close-rev { position: absolute; top: 20px; right: 20px; font-size: 40px; color: white; cursor: pointer; z-index: 10001; }
-
-        .whatsapp-float { position: fixed; bottom: 25px; right: 25px; background: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; z-index: 999; border: 2px solid white; }
+        body { background-color: #050505; color: white; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .admin-panel { display: none; position: fixed; inset: 0; z-index: 10000; background: #0a0a0a; overflow-y: auto; padding: 20px; }
+        .admin-panel.active { display: block; }
     </style>
 </head>
 <body>
 
-    <a href="https://wa.me/351933462128" target="_blank" class="whatsapp-float"><i class="fab fa-whatsapp"></i></a>
-
-    <nav class="fixed top-0 w-full glass border-b border-gray-900 z-[100] p-4 flex justify-between items-center">
-        <h1 onclick="location.reload()" class="text-2xl font-black italic cursor-pointer">X<span class="pink-text">-ACOMPANHANTES</span></h1>
-        <div class="flex gap-2">
-            <button onclick="showPage('catalog')" class="text-[10px] font-bold uppercase px-2">Início</button>
-            <button onclick="showPage('register')" class="pink-bg px-4 py-2 rounded-full text-[10px] font-bold uppercase shadow-lg">Anunciar</button>
-        </div>
+    <nav class="p-5 glass flex justify-between items-center sticky top-0 z-50">
+        <h1 class="text-2xl font-black italic text-pink-600">X-ACOMPANHANTES</h1>
+        <button onclick="openTab('anunciar')" class="bg-pink-600 px-4 py-2 rounded-full font-bold text-sm">ANUNCIAR</button>
     </nav>
 
-    <main class="flex-1">
-        <div id="city-section" class="pt-20 bg-black">
-            <div class="flex gap-2 overflow-x-auto px-4 py-4 no-scrollbar">
-                <button onclick="filtrar('Tudo')" class="city-btn active">TODAS</button>
-                <button onclick="filtrar('Lisboa')" class="city-btn">LISBOA</button>
-                <button onclick="filtrar('Porto')" class="city-btn">PORTO</button>
-                <button onclick="filtrar('Algarve')" class="city-btn">ALGARVE</button>
-                <button onclick="filtrar('Braga')" class="city-btn">BRAGA</button>
+    <div id="main-content" class="p-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <p class="col-span-full text-center text-gray-500 py-10">Carregando modelos verificadas...</p>
+    </div>
+
+    <div id="adminPanel" class="admin-panel">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold">Painel de Gestão</h2>
+                <button onclick="closeAdmin()" class="text-gray-400 text-xl">&times; Fechar</button>
             </div>
-        </div>
-
-        <div id="catalog-page" class="pb-24 pt-2 px-4 max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="grid-publico"></div>
-        </div>
-
-        <div id="register-page" class="hidden pt-32 pb-20 px-6 max-w-xl mx-auto">
-            <div class="bg-[#0f0f0f] p-8 rounded-[2rem] border border-gray-800">
-                <h2 class="text-2xl font-black mb-2 text-center uppercase">Publicar Anúncio</h2>
-                <p class="text-gray-500 text-center text-[10px] mb-8 uppercase tracking-widest">⭐ Promoção: 15 Dias Grátis ⭐</p>
-                <div class="space-y-4">
-                    <input type="text" id="nome" placeholder="Nome Artístico" class="w-full bg-black border border-gray-800 p-4 rounded-xl outline-none text-white">
-                    <select id="localidade" class="w-full bg-black border border-gray-800 p-4 rounded-xl outline-none text-gray-400">
-                        <option value="" disabled selected>Selecionar Cidade</option>
-                        <option value="Lisboa">Lisboa</option>
-                        <option value="Porto">Porto</option>
-                        <option value="Algarve">Algarve</option>
-                        <option value="Braga">Braga</option>
-                    </select>
-                    <input type="text" id="whatsapp" placeholder="WhatsApp (ex: 351...)" class="w-full bg-black border border-gray-800 p-4 rounded-xl outline-none text-white">
-                    <input type="text" id="preco" placeholder="Preço (ex: 100€/h)" class="w-full bg-black border border-gray-800 p-4 rounded-xl outline-none text-white">
-                    <div class="bg-black border-2 border-dashed border-gray-800 p-4 rounded-xl text-center">
-                        <input type="file" id="fotoInput" multiple class="text-xs text-gray-500">
-                    </div>
-                    <button onclick="enviarCadastro()" id="btnEnviar" class="w-full pink-bg py-5 rounded-xl font-black uppercase flex flex-col items-center">
-                        <span class="text-[10px] opacity-60 line-through">PREÇO: 25€</span>
-                        <span>ATIVAR 15 DIAS GRÁTIS</span>
-                    </button>
+            
+            <div id="pendingModels" class="space-y-4">
+                <p class="text-gray-400 text-center">Nenhuma modelo pendente para aprovação.</p>
                 </div>
-            </div>
         </div>
+    </div>
 
-        <div id="admin-page" class="hidden pt-32 px-6 max-w-4xl mx-auto pb-20">
-            <div id="lista-admin" class="space-y-3"></div>
-        </div>
-    </main>
-
-    <footer class="bg-[#080808] border-t border-gray-900 pt-12 pb-8 px-6 mt-auto">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 text-center md:text-left">
-            <div>
-                <h4 class="text-xl font-black italic mb-4">X<span class="pink-text">-ACOMPANHANTES</span></h4>
-                <p class="text-gray-500 text-[10px] uppercase">O portal de elite de Portugal.</p>
-            </div>
-            <div>
-                <h4 class="text-[10px] font-bold uppercase mb-4 text-gray-300">Navegação</h4>
-                <ul class="text-gray-500 text-[10px] space-y-2 uppercase font-bold">
-                    <li><button onclick="showPage('catalog')">Início</button></li>
-                    <li><button onclick="showPage('register')">Anunciar</button></li>
-                </ul>
-            </div>
-            <div>
-                <div class="inline-block border border-red-900 text-red-700 font-bold text-[10px] px-3 py-1 rounded mb-4 uppercase">MAIORES DE 18 ANOS</div>
-                <p class="text-gray-600 text-[9px] uppercase font-bold">&copy; 2026 X-ACOMPANHANTES. TODOS OS DIREITOS RESERVADOS.</p>
-            </div>
-        </div>
-    </footer>
-
-    <div id="magazine-view">
-        <span class="close-rev" onclick="fecharRevista()">&times;</span>
-        <span class="nav-rev left-0" onclick="mudarFoto(-1)"><i class="fas fa-chevron-left"></i></span>
-        <img id="full-img" src="">
-        <span class="nav-rev right-0" onclick="mudarFoto(1)"><i class="fas fa-chevron-right"></i></span>
+    <div onclick="openAdmin()" style="position: fixed; bottom: 20px; left: 20px; width: 45px; height: 45px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 999; cursor: pointer;">
+        <i class="fas fa-lock text-gray-600 text-xs"></i>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCzOCyLJjILaLYWejWRRo3o-2IjzNsNvrk",
-            authDomain: "x-acompanhantes.firebaseapp.com",
-            projectId: "x-acompanhantes",
-            storageBucket: "x-acompanhantes.firebasestorage.app",
-            messagingSenderId: "845747730590",
-            appId: "1:845747730590:web:52b4be5b58936421aa638f"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        function showPage(id) {
-            // MARTELADA: Esconde TUDO antes de mostrar a página
-            document.getElementById('catalog-page').classList.add('hidden');
-            document.getElementById('register-page').classList.add('hidden');
-            document.getElementById('admin-page').classList.add('hidden');
-            document.getElementById('city-section').classList.add('hidden');
-
-            // Mostra o que pediste
-            const page = document.getElementById(id + '-page');
-            if(page) page.classList.remove('hidden');
-
-            // Se for catálogo, volta a mostrar o filtro
-            if(id === 'catalog') {
-                document.getElementById('city-section').classList.remove('hidden');
-                loadCatalog();
+        // FUNÇÃO PARA ABRIR O ADMIN (SEM ERROS)
+        function openAdmin() {
+            const pass = prompt("Introduza a senha de acesso:");
+            if (pass === "157157") { // ALTERA "157157" PARA A TUA SENHA
+                document.getElementById('adminPanel').classList.add('active');
+            } else {
+                alert("Acesso Negado!");
             }
-
-            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        // Cadastro e Galeria...
-        let fotosAtuais = []; let indexAtual = 0;
-        function abrirRevista(f, i) { fotosAtuais = f; indexAtual = i; document.getElementById('full-img').src = f[i]; document.getElementById('magazine-view').style.display = 'flex'; }
-        function fecharRevista() { document.getElementById('magazine-view').style.display = 'none'; }
-        function mudarFoto(d) { indexAtual = (indexAtual + d + fotosAtuais.length) % fotosAtuais.length; document.getElementById('full-img').src = fotosAtuais[indexAtual]; }
+        function closeAdmin() {
+            document.getElementById('adminPanel').classList.remove('active');
+        }
 
-        async function enviarCadastro() {
-            const btn = document.getElementById('btnEnviar');
-            const files = document.getElementById('fotoInput').files;
-            if(!files.length) return alert("Sobe fotos!");
-            btn.innerText = "A ENVIAR..."; btn.disabled = true;
-            let fotosBase64 = [];
-            for (let f of files) {
-                const b64 = await new Promise(r => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(f);
-                    reader.onload = () => r(reader.result);
-                });
-                fotosBase64.push(b64);
+        // LÓGICA DE ATALHO DE TECLADO
+        let inputBuffer = "";
+        window.addEventListener("keydown", (e) => {
+            inputBuffer += e.key;
+            if (inputBuffer.endsWith("admin")) {
+                openAdmin();
+                inputBuffer = "";
             }
-            await db.collection("anuncios").add({
-                nome: document.getElementById('nome').value,
-                localidade: document.getElementById('localidade').value,
-                whatsapp: document.getElementById('whatsapp').value,
-                preco: document.getElementById('preco').value,
-                fotos: fotosBase64,
-                status: "pendente",
-                criado: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            alert("Sucesso! Aguarda aprovação."); location.reload();
-        }
+        });
 
-        function loadCatalog(filtro = "Tudo") {
-            const g = document.getElementById('grid-publico');
-            g.innerHTML = "";
-            let q = db.collection("anuncios").where("status", "==", "aprovado");
-            if(filtro !== "Tudo") q = q.where("localidade", "==", filtro);
-            q.get().then(snap => {
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    let slides = d.fotos.map((f, i) => `<img src="${f}" onclick='abrirRevista(${JSON.stringify(d.fotos)}, ${i})'>`).join('');
-                    g.innerHTML += `<div class="card-model shadow-2xl">
-                        <div class="slider-container"><div class="photo-slider">${slides}</div></div>
-                        <div class="p-6">
-                            <h3 class="text-2xl font-black uppercase italic">${d.nome} <i class="fas fa-check-circle text-blue-500 text-sm"></i></h3>
-                            <p class="text-[9px] text-gray-500 mb-4">${d.localidade}</p>
-                            <div class="flex gap-2">
-                                <a href="https://wa.me/${d.whatsapp}" class="flex-1 bg-green-600 py-4 rounded-2xl text-center font-bold text-xs uppercase">WhatsApp</a>
-                            </div>
-                        </div>
-                    </div>`;
-                });
-            });
-        }
-
-        function filtrar(c) {
-            document.querySelectorAll('.city-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            loadCatalog(c);
-        }
-
-        loadCatalog();
+        // NOTA: Aqui deves manter a tua configuração do Firebase 
+        // para buscar (fetch) as modelos e preencher as divs.
     </script>
-    <div id="admin-trigger" onclick="toggleAdminPanel()" style="position: fixed; bottom: 20px; left: 20px; width: 45px; height: 45px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 9999; cursor: pointer; backdrop-filter: blur(5px);">
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="white" viewBox="0 0 16 16" style="opacity: 0.5;">
-        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-    </svg>
-</div>
-
-<script>
-function toggleAdminPanel() {
-    // Esta função força a abertura do painel de administração que já está no teu código
-    if (typeof showAdmin === "function") {
-        showAdmin();
-    } else {
-        // Caso a função showAdmin não exista com esse nome, tentamos mudar o hash
-        window.location.hash = 'admin';
-        location.reload();
-    }
-}
-
-// Atalho extra: Se digitares "admin" no teclado, ele também abre
-let keys = "";
-window.addEventListener("keydown", (e) => {
-    keys += e.key;
-    if (keys.endsWith("admin")) {
-        toggleAdminPanel();
-        keys = "";
-    }
-});
-</script>
 </body>
 </html>
