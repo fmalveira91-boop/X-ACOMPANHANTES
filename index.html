@@ -110,7 +110,7 @@
             location.reload();
         };
 
-        async function carregarModelos() {
+       async function carregarModelos() {
             try {
                 const res = await fetch(SHEETDB_URL + "/search?aprovado=sim");
                 const modelos = await res.json();
@@ -121,32 +121,46 @@
                     const galeriaId = `galeria-${idx}`;
                     let slides = "";
                     
-                    // Criação dos slides (Modo Revista)
-                    for(let i=0; i<6; i++) {
-                        const linkBase = m.fotos.split('nth/')[0].split('~')[0];
-                        const fotoFinal = `${linkBase}nth/${i}/-/preview/600x800/-/quality/smart/`;
-                        slides += `<div class="swiper-slide"><img src="${fotoFinal}" class="snap-item" onerror="this.parentElement.remove()"></div>`;
+                    // Limpeza radical do link para garantir que pega a imagem
+                    // Remove qualquer sufixo que o Uploadcare tenha colocado
+                    const linkPuro = m.fotos.split('nth/')[0].split('-/')[0].split('~')[0];
+                    
+                    // Se o link não terminar em barra, adicionamos uma
+                    const linkFinal = linkPuro.endsWith('/') ? linkPuro : linkPuro + '/';
+
+                    // Criamos os slides tentando puxar as fotos do grupo
+                    for(let i=0; i<5; i++) {
+                        const fotoUrl = `${linkFinal}nth/${i}/-/quality/smart/-/format/auto/`;
+                        slides += `<div class="swiper-slide"><img src="${fotoUrl}" class="snap-item" onerror="this.parentElement.remove()"></div>`;
                     }
 
                     grid.innerHTML += `
                     <div class="app-card">
-                        <div class="swiper ${galeriaId}"><div class="swiper-wrapper">${slides}</div><div class="swiper-pagination"></div></div>
+                        <div class="swiper ${galeriaId}">
+                            <div class="swiper-wrapper">${slides}</div>
+                            <div class="swiper-pagination"></div>
+                        </div>
                         <div class="p-6">
-                            <h3 class="text-2xl font-black italic uppercase">${m.nome}</h3>
-                            <p class="text-pink-600 text-[10px] font-bold uppercase">📍 ${m.cidade}</p>
-                            <div class="flex justify-between items-center mt-4">
-                                <span class="text-zinc-500 text-xs font-bold uppercase">${m.idade} ANOS</span>
-                                <span class="text-white font-black text-xl">${m.valor}€</span>
+                            <h3 class="text-3xl font-black italic uppercase">${m.nome}</h3>
+                            <p class="text-pink-600 text-xs font-bold uppercase mb-4">📍 ${m.cidade}</p>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-zinc-500 text-sm font-bold">${m.idade} ANOS</span>
+                                <span class="text-white font-black text-2xl">${m.valor}€</span>
                             </div>
-                            <a href="https://wa.me/${m.tel}" class="bg-green-600 flex justify-center p-4 rounded-2xl font-black text-xs uppercase mt-4 shadow-lg"><i class="fab fa-whatsapp mr-2"></i> WhatsApp</a>
+                            <a href="https://wa.me/${m.tel}" class="bg-[#16a34a] flex justify-center items-center p-5 rounded-2xl font-black text-sm uppercase mt-6 shadow-lg"><i class="fab fa-whatsapp mr-2 text-xl"></i> WhatsApp</a>
                         </div>
                     </div>`;
 
-                    setTimeout(() => { new Swiper(`.${galeriaId}`, { pagination: { el: '.swiper-pagination', clickable: true } }); }, 200);
+                    setTimeout(() => { 
+                        new Swiper(`.${galeriaId}`, { 
+                            pagination: { el: '.swiper-pagination', clickable: true },
+                            observer: true,
+                            observeParents: true
+                        }); 
+                    }, 300);
                 });
             } catch (e) { console.log("Erro ao carregar"); }
         }
-
         async function abrirAdmin() {
             if(prompt("PASSWORD ADMIN:") === "olokobicho77") {
                 document.getElementById('painelAdmin').classList.remove('hidden');
