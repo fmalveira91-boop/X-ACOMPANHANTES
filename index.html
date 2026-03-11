@@ -3,84 +3,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>X-ACOMPANHANTES</title>
+    <title>X-ACOMPANHANTES | Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; }
-        .app-card { background: #0a0a0a; border-radius: 30px; overflow: hidden; margin-bottom: 25px; border: 1px solid #1a1a1a; }
-        .snap-item { width: 100%; height: 500px; object-fit: cover; }
+        body { background: #000; color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .app-card { background: #0a0a0a; border-radius: 35px; overflow: hidden; margin-bottom: 30px; border: 1px solid #1a1a1a; transition: 0.3s; }
+        .snap-item { width: 100%; height: 550px; object-fit: cover; background: #111; }
+        .glass { background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(20px); border-top: 1px solid #222; }
         .hidden { display: none; }
-        .swiper { width: 100%; height: 500px; }
+        .swiper { width: 100%; height: 550px; }
+        .swiper-pagination-bullet-active { background: #db2777 !important; }
+        .uploadcare--widget__button_type_open {
+            background: #db2777 !important; border-radius: 15px !important; padding: 12px !important;
+            border: none !important; color: white !important; font-weight: bold !important;
+        }
     </style>
 </head>
 <body>
-    <header class="p-6 flex justify-between items-center sticky top-0 z-50 bg-black">
-        <h1 onclick="location.reload()" class="text-xl font-black italic text-pink-600 uppercase cursor-pointer">X-ACOMPANHANTES</h1>
-        <button onclick="showTab('anunciar')" class="bg-pink-600 px-4 py-2 rounded-full text-xs font-bold uppercase">Anunciar</button>
+
+    <header class="p-6 flex justify-between items-center sticky top-0 z-[100] bg-black border-b border-zinc-900">
+        <h1 onclick="showTab('home')" class="text-2xl font-black italic text-pink-600 tracking-tighter cursor-pointer uppercase">X-ACOMPANHANTES</h1>
+        <button onclick="showTab('anunciar')" class="bg-pink-600 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-pink-900/20">Anunciar</button>
     </header>
 
-    <main id="tab-home" class="p-4 pb-32">
-        <div id="grid-modelos"></div>
+    <!-- TAB HOME -->
+    <main id="tab-home" class="p-4 pb-40 max-w-7xl mx-auto">
+        <div id="grid-modelos" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <p class="col-span-full text-center py-20 text-zinc-800 font-bold uppercase animate-pulse italic">A carregar anúncios...</p>
+        </div>
     </main>
 
-    <section id="tab-anunciar" class="hidden p-6 pb-32">
-        <form id="form-anuncio" class="space-y-4">
-            <input type="text" name="nome" placeholder="Nome" class="w-full bg-zinc-900 p-4 rounded-xl" required>
-            <input type="text" name="cidade" placeholder="Cidade" class="w-full bg-zinc-900 p-4 rounded-xl" required>
-            <input type="text" name="tel" placeholder="WhatsApp (351...)" class="w-full bg-zinc-900 p-4 rounded-xl" required>
-            <input type="hidden" role="uploadcare-uploader" name="fotos" id="foto-input" data-public-key="3027e0eb84735c5c7066" data-multiple="true" />
+    <!-- TAB ANUNCIAR -->
+    <section id="tab-anunciar" class="hidden p-6 pb-40">
+        <form id="form-anuncio" class="max-w-md mx-auto space-y-4">
+            <h2 class="text-3xl font-black italic text-pink-600 uppercase tracking-tighter">Novo Perfil</h2>
+            <input type="text" name="nome" placeholder="Nome Profissional" class="w-full bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800 focus:border-pink-600 transition-all" required>
+            <input type="text" name="cidade" placeholder="Cidade" class="w-full bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800 focus:border-pink-600 transition-all" required>
+            <div class="flex gap-2">
+                <input type="number" name="idade" placeholder="Idade" class="w-1/2 bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800">
+                <input type="text" name="valor" placeholder="Preço €" class="w-1/2 bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800">
+            </div>
+            <!-- FIX #8: Campo tel com instrução clara -->
+            <input type="tel" name="tel" placeholder="WhatsApp só números (Ex: 351912345678)" class="w-full bg-zinc-900 p-5 rounded-2xl outline-none border border-zinc-800 focus:border-pink-600 transition-all" required>
+
+            <div class="bg-zinc-900 p-8 rounded-3xl border-2 border-dashed border-zinc-800 text-center">
+                <p class="text-[10px] font-black text-zinc-400 mb-4 uppercase tracking-widest">Galeria de Fotos (Selecione várias)</p>
+                <!-- FIX: Uploadcare com data-multiple -->
+                <input type="hidden" role="uploadcare-uploader" name="fotos" id="foto-input"
+                       data-public-key="3027e0eb84735c5c7066"
+                       data-multiple="true"
+                       data-tabs="file camera" />
+            </div>
+
             <input type="hidden" name="aprovado" value="nao">
-            <button type="submit" id="btn-submit" class="w-full bg-white text-black p-4 rounded-xl font-bold uppercase opacity-50" disabled>Carrega as fotos primeiro</button>
+            <!-- FIX: ID único para evitar aprovação duplicada (#7) -->
+            <input type="hidden" name="uid" id="campo-uid">
+
+            <button type="submit" id="btn-submit"
+                class="w-full bg-white text-black p-5 rounded-2xl font-black uppercase tracking-widest opacity-50 cursor-not-allowed transform active:scale-95 transition-all"
+                disabled>Aguardando Fotos...</button>
         </form>
     </section>
+
+    <!-- BOTÃO ADMIN OCULTO -->
+    <div onclick="abrirAdmin()" style="position: fixed; bottom: 120px; left: 25px; width: 45px; height: 45px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 1000; border: 1px solid rgba(255,255,255,0.1);">
+        <i class="fas fa-lock text-zinc-700 text-sm"></i>
+    </div>
+
+    <!-- PAINEL ADMIN -->
+    <div id="painelAdmin" class="hidden fixed inset-0 z-[200] bg-black p-8 overflow-y-auto">
+        <h2 class="text-2xl font-black text-yellow-500 italic mb-8 uppercase tracking-tighter">Aprovação de Perfis</h2>
+        <div id="lista-pendentes" class="grid gap-4"></div>
+        <button onclick="document.getElementById('painelAdmin').classList.add('hidden')" class="mt-12 text-zinc-500 text-[10px] font-black uppercase underline tracking-widest">Fechar Painel</button>
+    </div>
+
+    <!-- NAV -->
+    <nav class="fixed bottom-6 left-6 right-6 h-20 glass rounded-[40px] flex justify-around items-center z-[150] shadow-2xl">
+        <div onclick="showTab('home')" class="text-pink-600 text-2xl cursor-pointer"><i class="fas fa-fire"></i></div>
+        <div onclick="showTab('anunciar')" class="text-zinc-600 text-2xl cursor-pointer"><i class="fas fa-plus-circle"></i></div>
+    </nav>
+
     <script>
         const SHEETDB_URL = "https://sheetdb.io/api/v1/yi889rrw0okh5";
-        
+
+        // Gerar UID único ao carregar a página (FIX #7)
+        document.getElementById('campo-uid').value = 'uid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+        // =============================================
+        // FIX #3: Usar widget.onChange em vez de onUploadComplete
+        // =============================================
         const widget = uploadcare.Widget('#foto-input');
-        widget.onUploadComplete(() => {
-            document.getElementById('btn-submit').disabled = false;
-            document.getElementById('btn-submit').classList.remove('opacity-50');
-            document.getElementById('btn-submit').innerText = "PUBLICAR AGORA";
+        widget.onChange(function(fileGroup) {
+            if (fileGroup) {
+                fileGroup.promise().then(function(groupInfo) {
+                    const btn = document.getElementById('btn-submit');
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btn.innerText = "Publicar Perfil";
+                });
+            }
         });
 
+        // =============================================
+        // SHOW TAB
+        // =============================================
         function showTab(t) {
             document.getElementById('tab-home').classList.toggle('hidden', t !== 'home');
             document.getElementById('tab-anunciar').classList.toggle('hidden', t !== 'anunciar');
+            window.scrollTo(0, 0);
         }
 
-        async function carregarModelos() {
-            const res = await fetch(SHEETDB_URL + "/search?aprovado=sim");
-            const modelos = await res.json();
-            const grid = document.getElementById('grid-modelos');
-            grid.innerHTML = "";
-            
-            modelos.forEach((m, idx) => {
-                const gid = `g-${idx}`;
-                // CORREÇÃO DO LINK: Corta o ~5/ e limpa o URL
-                let base = m.fotos.split('~')[0].split('nth/')[0];
-                if(!base.endsWith('/')) base += '/';
+        // =============================================
+        // SUBMIT FORM
+        // =============================================
+        document.getElementById('form-anuncio').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit');
 
-                let slides = "";
-                for(let i=0; i<5; i++) {
-                    slides += `<div class="swiper-slide"><img src="${base}nth/${i}/" class="snap-item" onerror="this.parentElement.remove()"></div>`;
+            // FIX #8: Validar telefone
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            const tel = data.tel.replace(/\D/g, '');
+            if (tel.length < 9) {
+                alert("Número de WhatsApp inválido! Use apenas números.");
+                return;
+            }
+            data.tel = tel;
+
+            btn.innerText = "A GUARDAR DADOS...";
+            btn.disabled = true;
+
+            try {
+                await fetch(SHEETDB_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: data })
+                });
+                alert("Sucesso! O perfil aguarda aprovação.");
+                location.reload();
+            } catch (err) {
+                alert("Erro ao guardar. Tenta novamente.");
+                btn.innerText = "Publicar Perfil";
+                btn.disabled = false;
+            }
+        };
+
+        // =============================================
+        // CARREGAR MODELOS — FIX #1 (fotos), #2 (swiper class), #5 (timing), #6 (innerHTML loop)
+        // =============================================
+        async function carregarModelos() {
+            const grid = document.getElementById('grid-modelos');
+            try {
+                const res = await fetch(SHEETDB_URL + "/search?aprovado=sim");
+                const modelos = await res.json();
+
+                if (!modelos.length) {
+                    grid.innerHTML = "<p class='col-span-full text-center py-20 text-zinc-800 font-bold uppercase'>SEM ANÚNCIOS ATIVOS</p>";
+                    return;
                 }
 
-                grid.innerHTML += `
-                <div class="app-card">
-                    <div class="swiper ${gid}"><div class="swiper-wrapper">${slides}</div></div>
-                    <div class="p-6">
-                        <h3 class="text-2xl font-bold uppercase italic">${m.nome}</h3>
-                        <p class="text-pink-600 text-sm font-bold uppercase">${m.cidade}</p>
-                        <a href="https://wa.me/${m.tel}" class="bg-green-600 block text-center p-3 rounded-xl mt-4 font-bold">WHATSAPP</a>
-                    </div>
-                </div>`;
-                setTimeout(() => { new Swiper(`.${gid}`, { observer: true, observeParents: true }); }, 300);
-            });
+                // FIX #6: Construir todo o HTML de uma vez, não com += dentro do loop
+                const htmlCards = modelos.map((m, idx) => {
+                    // FIX #2: Prefixo com letra para classe CSS válida
+                    const galeriaId = `swiper-galeria-${idx}`;
+
+                    // =============================================
+                    // FIX #1: LÓGICA CORRECTA PARA FOTOS UPLOADCARE
+                    // O widget multiple retorna uma URL de grupo no formato:
+                    // https://ucarecdn.com/UUID~N/   (N = número de ficheiros)
+                    // Para aceder a cada foto: https://ucarecdn.com/UUID~N/nth/INDEX/
+                    // =============================================
+                    let grupoUrl = m.fotos ? m.fotos.trim() : '';
+
+                    // Garantir que a URL começa com https
+                    if (grupoUrl && !grupoUrl.startsWith('http')) {
+                        grupoUrl = 'https://ucarecdn.com/' + grupoUrl;
+                    }
+                    // Garantir barra no final
+                    if (grupoUrl && !grupoUrl.endsWith('/')) {
+                        grupoUrl += '/';
+                    }
+
+                    // Extrair número de ficheiros do grupo (ex: UUID~5/ → 5 fotos)
+                    const matchN = grupoUrl.match(/~(\d+)\//);
+                    const numFotos = matchN ? Math.min(parseInt(matchN[1]), 10) : 6;
+
+                    // Gerar slides com URL correta para cada foto do grupo
+                    let slides = '';
+                    for (let i = 0; i < numFotos; i++) {
+                        // Formato correto: grupoUrl + nth/INDEX/-/quality/smart/-/format/auto/
+                        const fotoUrl = `${grupoUrl}nth/${i}/-/quality/smart/-/format/auto/`;
+                        slides += `<div class="swiper-slide">
+                            <img src="${fotoUrl}" class="snap-item"
+                                 onerror="this.closest('.swiper-slide').remove()"
+                                 loading="lazy" alt="Foto ${i+1} de ${m.nome}">
+                        </div>`;
+                    }
+
+                    return `
+                    <div class="app-card shadow-2xl">
+                        <div class="swiper ${galeriaId}">
+                            <div class="swiper-wrapper">${slides}</div>
+                            <div class="swiper-pagination"></div>
+                        </div>
+                        <div class="p-8">
+                            <h3 class="text-3xl font-black italic uppercase tracking-tighter">${m.nome}</h3>
+                            <p class="text-pink-600 text-[10px] font-black uppercase tracking-widest mt-1">📍 ${m.cidade}</p>
+                            <div class="flex justify-between items-center mt-6">
+                                <span class="text-zinc-500 text-xs font-bold uppercase tracking-widest">${m.idade} ANOS</span>
+                                <span class="text-white font-black text-2xl">${m.valor}€</span>
+                            </div>
+                            <a href="https://wa.me/${m.tel}"
+                               class="bg-[#16a34a] flex justify-center items-center p-5 rounded-2xl font-black text-xs uppercase mt-6 shadow-lg border-b-4 border-green-800 active:border-0 transition-all">
+                                <i class="fab fa-whatsapp mr-2 text-xl"></i> WhatsApp
+                            </a>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                // Inserir todo o HTML de uma vez
+                grid.innerHTML = htmlCards;
+
+                // FIX #5: Inicializar Swipers após o DOM estar pronto com requestAnimationFrame
+                requestAnimationFrame(() => {
+                    modelos.forEach((m, idx) => {
+                        const galeriaId = `swiper-galeria-${idx}`;
+                        new Swiper(`.${galeriaId}`, {
+                            pagination: {
+                                el: `.${galeriaId} .swiper-pagination`,
+                                clickable: true
+                            },
+                            observer: true,
+                            observeParents: true,
+                            lazy: true
+                        });
+                    });
+                });
+
+            } catch (err) {
+                // FIX #9: Mostrar erro ao utilizador
+                console.error("Erro ao carregar modelos:", err);
+                grid.innerHTML = "<p class='col-span-full text-center py-20 text-red-500 font-bold uppercase'>Erro ao carregar anúncios. Refresca a página.</p>";
+            }
         }
+
+        // =============================================
+        // PAINEL ADMIN — FIX #4 (password ofuscada) + FIX #7 (aprovar por uid)
+        // =============================================
+        async function abrirAdmin() {
+            // FIX #4: Password em base64 (dificulta leitura casual no código)
+            const senhaCorreta = atob("b2xva29iaWNobzc3");
+            if (prompt("PASSWORD ADMIN:") !== senhaCorreta) return;
+
+            document.getElementById('painelAdmin').classList.remove('hidden');
+
+            try {
+                const res = await fetch(SHEETDB_URL + "/search?aprovado=nao");
+                const pendentes = await res.json();
+                const container = document.getElementById('lista-pendentes');
+
+                if (!pendentes.length) {
+                    container.innerHTML = "<p class='text-zinc-500 font-bold uppercase'>Nada pendente.</p>";
+                    return;
+                }
+
+                // FIX #7: Guardar uid no botão para aprovação precisa
+                container.innerHTML = pendentes.map(p => `
+                    <div class="bg-zinc-900 p-5 rounded-3xl flex justify-between items-center border border-zinc-800">
+                        <div>
+                            <span class="font-bold uppercase text-sm tracking-widest block">${p.nome}</span>
+                            <span class="text-zinc-500 text-xs">${p.cidade || ''} · ${p.idade || ''}a · ${p.tel || ''}</span>
+                        </div>
+                        <button onclick="aprovar('${p.uid}')"
+                            class="bg-green-600 text-[10px] font-black px-6 py-3 rounded-xl uppercase tracking-widest">
+                            Aprovar
+                        </button>
+                    </div>
+                `).join('');
+
+            } catch (err) {
+                document.getElementById('lista-pendentes').innerHTML = "<p class='text-red-500'>Erro ao carregar pendentes.</p>";
+            }
+        }
+
+        // FIX #7: Aprovar por uid em vez de nome
+        async function aprovar(uid) {
+            if (!uid) {
+                alert("Erro: perfil sem ID. Não é possível aprovar.");
+                return;
+            }
+            try {
+                await fetch(SHEETDB_URL + "/uid/" + uid, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: { aprovado: 'sim' } })
+                });
+                alert("Perfil ativado com sucesso!");
+                location.reload();
+            } catch (err) {
+                alert("Erro ao aprovar. Tenta novamente.");
+            }
+        }
+
+        // Iniciar
         carregarModelos();
     </script>
 </body>
