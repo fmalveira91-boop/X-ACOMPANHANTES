@@ -96,7 +96,7 @@
             location.reload();
         };
 
-        async function carregarModelos() {
+       async function carregarModelos() {
             try {
                 const res = await fetch(SHEETDB_URL + "/search?aprovado=sim");
                 const modelos = await res.json();
@@ -104,10 +104,17 @@
                 grid.innerHTML = modelos.length ? "" : "<p class='text-center py-20 text-zinc-800'>Sem perfis ativos.</p>";
                 
                 modelos.forEach(m => {
-                    const foto = m.fotos.split(' ')[0] + "-/preview/";
+                    // Esta linha abaixo é o segredo para a foto aparecer:
+                    let fotoLimpa = m.fotos.split(' ')[0];
+                    if(fotoLimpa.includes('null')) {
+                         fotoLimpa = "https://placehold.co/400x600/111/white?text=Sem+Foto";
+                    } else {
+                         fotoLimpa = fotoLimpa + "-/preview/ -/quality/smart/";
+                    }
+
                     grid.innerHTML += `
                     <div class="app-card">
-                        <img src="${foto}" class="snap-item">
+                        <img src="${fotoLimpa}" class="snap-item" loading="lazy">
                         <div class="p-6">
                             <h3 class="text-2xl font-black italic uppercase">${m.nome}</h3>
                             <p class="text-pink-600 text-[10px] font-bold">📍 ${m.cidade}</p>
