@@ -157,6 +157,98 @@
         }
 
         carregarModelos();
+        const SHEETDB_URL = "https://sheetdb.io/api/v1/yi889rrw0okh5";
+
+        function showTab(t) {
+            document.getElementById('tab-home').classList.toggle('hidden', t !== 'home');
+            document.getElementById('tab-anunciar').classList.toggle('hidden', t !== 'anunciar');
+        }
+
+        // ENVIAR DADOS
+        document.getElementById('form-anuncio').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit');
+            btn.innerText = "A ENVIAR...";
+            btn.disabled = true;
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            await fetch(SHEETDB_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ data: data })
+            });
+
+            alert("Perfil enviado! Aguarde a aprovação.");
+            location.reload();
+        };
+
+        // CARREGAR NO FEED (VERSÃO CORRIGIDA PARA GRUPOS DE FOTOS)
+        async function carregarModelos() {
+            try {
+                const res = await fetch(SHEETDB_URL + "/search?aprovado=sim");
+                const modelos = await res.json();
+                const grid = document.getElementById('grid-modelos');
+                grid.innerHTML = modelos.length ? "" : "<p class='text-center py-20 text-zinc-800'>Sem perfis ativos.</p>";
+                
+                modelos.forEach(m => {
+                    let fotoUrl = m.fotos;
+                    
+                    // MÁGICA: Se for um grupo de fotos, força a exibição da primeira foto do grupo
+                    if (fotoUrl.includes('/#') || fotoUrl.includes('/~')) {
+                        fotoUrl = fotoUrl + "nth/0/";
+                    }
+                    
+                    // Adiciona o filtro de pré-visualização para carregar rápido
+                    const fotoFinal = fotoUrl + "-/preview/400x600/-/quality/smart/-/format/auto/";
+
+                    grid.innerHTML += `
+                    <div class="app-card">
+                        <img src="${fotoFinal}" class="snap-item" onerror="this.src='https://placehold.co/400x600/111/white?text=Foto+Indisponivel'">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-black italic uppercase">${m.nome}</h3>
+                            <p class="text-pink-600 text-[10px] font-bold">📍 ${m.cidade}</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <span class="text-zinc-500 font-bold">${m.idade} anos</span>
+                                <span class="text-white font-black text-xl">${m.valor}€</span>
+                            </div>
+                            <a href="https://wa.me/${m.tel}" class="bg-green-600 flex justify-center p-4 rounded-2xl font-black text-xs uppercase mt-4">WhatsApp</a>
+                        </div>
+                    </div>`;
+                });
+            } catch (e) { console.log("Erro ao carregar"); }
+        }
+
+        // SISTEMA DE CADEADO
+        async function abrirAdmin() {
+            if(prompt("PASSWORD ADMIN:") === "olokobicho77") {
+                document.getElementById('painelAdmin').classList.remove('hidden');
+                const res = await fetch(SHEETDB_URL + "/search?aprovado=nao");
+                const pendentes = await res.json();
+                const container = document.getElementById('lista-pendentes');
+                container.innerHTML = pendentes.length ? "" : "Nada pendente.";
+                pendentes.forEach(p => {
+                    container.innerHTML += `
+                    <div class="bg-zinc-900 p-4 rounded-2xl flex justify-between items-center mb-2">
+                        <span>${p.nome}</span>
+                        <button onclick="aprovar('${p.nome}')" class="bg-green-600 text-[10px] font-bold px-4 py-2 rounded-full">APROVAR</button>
+                    </div>`;
+                });
+            }
+        }
+
+        async function aprovar(nome) {
+            await fetch(SHEETDB_URL + "/nome/" + nome, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({data: {aprovado: 'sim'}})
+            });
+            alert("Aprovado!");
+            location.reload();
+        }
+
+        carregarModelos();
     </script>
 </body>
 </html>
