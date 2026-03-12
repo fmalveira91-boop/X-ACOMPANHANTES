@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>X-ACOMPANHANTES | Perfis Verificados</title>
-    <meta name="description" content="Encontra os melhores perfis verificados perto de ti. Anuncie agora.">
-    <meta property="og:title" content="X-ACOMPANHANTES | Perfis Verificados">
+    <title>XXX ACOMPANHANTES | Perfis Verificados</title>
+    <meta name="description" content="XXX Acompanhantes — Perfis verificados perto de ti. Anuncie agora.">
+    <meta property="og:title" content="XXX ACOMPANHANTES | Perfis Verificados">
     <meta property="og:description" content="Perfis verificados. Discreção total.">
     <meta name="theme-color" content="#000000">
 
     <!-- PWA Manifest inline -->
-    <link rel="manifest" href="data:application/json,{%22name%22:%22X-Acompanhantes%22,%22short_name%22:%22X-ACOMP%22,%22display%22:%22standalone%22,%22background_color%22:%22%23000%22,%22theme_color%22:%22%23db2777%22}">
+    <link rel="manifest" href="data:application/json,{%22name%22:%22XXX%20Acompanhantes%22,%22short_name%22:%22XXXACOMP%22,%22display%22:%22standalone%22,%22background_color%22:%22%23000%22,%22theme_color%22:%22%23db2777%22}">
 
     <!-- Fonte premium -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -301,7 +301,7 @@
 <!-- HEADER -->
 <header class="px-5 py-4 flex justify-between items-center sticky top-0 z-[100] bg-black border-b border-zinc-900/60">
     <div onclick="showTab('home')" class="cursor-pointer select-none">
-        <p class="site-title">X-<span>ACOMP</span></p>
+        <p class="site-title">XXX<span>ACOMP</span></p>
         <p style="font-size:9px;color:#333;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;">Perfis verificados</p>
     </div>
     <div class="flex items-center gap-2">
@@ -380,7 +380,7 @@
                 </div>
             </div>
             <p id="aviso-premium" class="hidden" style="font-size:11px;color:var(--gold);margin-top:10px;padding:12px 16px;background:rgba(245,200,66,0.06);border-radius:12px;border:1px solid rgba(245,200,66,0.15);">
-                💳 Após submeter, receberás instruções de pagamento via WhatsApp para ativar o Premium.
+                💳 Para ativar o Premium envia <strong>15€</strong> via Wise:<br><a href="https://wise.com/pay/me/fredericom459" target="_blank" style="color:var(--gold);font-weight:900;text-decoration:underline;">wise.com/pay/me/fredericom459</a><br><span style="color:#555;font-size:10px;">Referência: o teu nome profissional. Ativação em até 24h.</span>
             </p>
         </div>
 
@@ -669,7 +669,7 @@ document.getElementById('form-anuncio').addEventListener('submit', async (e) => 
 
         const plano = data.plano;
         if (plano === 'premium') {
-            toast('✅ Enviado! Vais receber instruções de pagamento.', 'info', 5000);
+            toast('✅ Enviado! Acede ao link Wise para pagar e ativar o Premium.', 'info', 6000); setTimeout(() => { window.open('https://wise.com/pay/me/fredericom459', '_blank'); }, 2000);
         } else {
             toast('✅ Perfil enviado! Aguarda aprovação.', 'success', 4000);
         }
